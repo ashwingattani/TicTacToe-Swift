@@ -14,34 +14,46 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        resultLabel.text = board.checkResult().rawValue
+        resultLabel.text = board.checkTurn() == 1 ? "Player X Turn" : "Player O Turn"
     }
 
     @IBAction func buttonTapped(sender: UIButton) {
         if sender.title(for: .normal) != "---" {return}
         
-        var buttonText: String
-        var buttonValue: Int
-        switch board.checkResult() {
-            case .PlayerXTurn:
-                buttonText = "X"
-                buttonValue = 1
-            case .PlayerOTurn:
-                buttonText = "O"
-                buttonValue = 2
-            default:
-                buttonText = "---"
-                buttonValue = 0
-        }
+        let buttonText = board.checkTurn() == 1 ? "X" : "O"
+        let labelText = board.checkTurn() == 1 ? "Player O Turn" : "Player X Turn"
+//        var buttonValue: Int
+//        switch board.checkResult() {
+//            case .PlayerXTurn:
+//                buttonText = "X"
+//                buttonValue = 1
+//            case .PlayerOTurn:
+//                buttonText = "O"
+//                buttonValue = 2
+//            default:
+//                buttonText = "---"
+//                buttonValue = 0
+//        }
         
-        board.board[(sender.tag-1)/3][(sender.tag-1)%3] = buttonValue
+        let i = (sender.tag-1)/3
+        let j = (sender.tag-1)%3
+        
+        board.board[i][j] = board.checkTurn()
         sender.setTitle(buttonText, for: .normal)
-        resultLabel.text = board.checkResult().rawValue
+        resultLabel.text = labelText
+        
+        if board.checkIfCurrentPlayerWins(i: i, j: j) {
+            resultLabel.text = board.checkTurn() == 1 ? "Player X Wins" : "Player O Wins"
+        } else {
+            if !board.next() {
+                resultLabel.text = "Its a Draw"
+            }
+        }
     }
 
     @IBAction func reset(sender: UIButton) {
         board.resetBoard()
-        resultLabel.text = board.checkResult().rawValue
+        resultLabel.text = board.checkTurn() == 1 ? "Player X Turn" : "Player O Turn"
         
         for i in 1...9 {
             (self.view.viewWithTag(i) as! UIButton).setTitle("---", for: .normal)
